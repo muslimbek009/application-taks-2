@@ -14,13 +14,13 @@ import {
 import { router } from "expo-router";
 import BottomSheetDialog from "@/components/BottomSheet";
 
-// Custom Toast component for web
+// Custom Toast component for web with black and red styling
 const Toast = ({ visible, message, onDismiss }) => {
   useEffect(() => {
     if (visible) {
       const timer = setTimeout(() => {
         onDismiss();
-      }, 2000); // Dismiss after 2 seconds
+      }, 2500);
       return () => clearTimeout(timer);
     }
   }, [visible, onDismiss]);
@@ -29,7 +29,9 @@ const Toast = ({ visible, message, onDismiss }) => {
 
   return (
     <View style={styles.toastContainer}>
-      <Text style={styles.toastText}>{message}</Text>
+      <View style={styles.toastContent}>
+        <Text style={styles.toastText}>{message}</Text>
+      </View>
     </View>
   );
 };
@@ -63,11 +65,11 @@ export default function TasksScreen() {
 
   // Sample data for RecyclerView (FlatList in React Native)
   const items = [
-    { id: "1", name: "Item 1" },
-    { id: "2", name: "Item 2" },
-    { id: "3", name: "Item 3" },
-    { id: "4", name: "Item 4" },
-    { id: "5", name: "Item 5" },
+    { id: "1", name: "Dota 2" },
+    { id: "2", name: "League of Legends" },
+    { id: "3", name: "Counter-Strike: Global Offensive" },
+    { id: "5", name: "Fortnite" },
+    { id: "6", name: "Apex Legends" },
   ];
 
   // 1. BottomSheetDialog functionality
@@ -107,12 +109,70 @@ export default function TasksScreen() {
         />
       )}
 
-      <Text style={styles.header}>Mobile Development Tasks</Text>
+      <Text style={styles.header}>Mobile Application Development Task 2</Text>
 
-      {/* Task 1: Bottom Sheet Dialog */}
-      <TouchableOpacity style={styles.button} onPress={toggleBottomSheet}>
-        <Text style={styles.buttonText}>Show Bottom Sheet Menu</Text>
-      </TouchableOpacity>
+      {/* Reordered elements */}
+      {/* Task 3: RecyclerView with ClickListener (moved to top) */}
+      <Text style={styles.sectionTitle}>Items:</Text>
+      <FlatList
+        data={items}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.listItem}
+            onPress={() => handleItemClick(item)}
+          >
+            <Text style={styles.itemText}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id}
+        style={styles.flatList}
+      />
+
+      {/* Task 2: Rotating Image (moved to middle) */}
+      <View style={styles.imageContainer}>
+        <Animated.Image
+          source={{
+            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMtlFoYajHq1AuRRChUQ4oQISSvqn1j5lGVw&s",
+          }}
+          alt={"Helloworld"}
+          style={[styles.image, { transform: [{ rotate: rotation }] }]}
+        />
+        <TouchableOpacity
+          style={styles.redButton}
+          onPress={() => {
+            rotateImage();
+            showToast("Image rotating", setToastVisible, setToastMessage);
+          }}
+        >
+          <Text style={styles.buttonText}>Rotate Image</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom section with two buttons side by side */}
+      <View style={styles.bottomSection}>
+        {/* Task 1: Bottom Sheet Dialog (moved to bottom left) */}
+        <TouchableOpacity
+          style={styles.blackButton}
+          onPress={toggleBottomSheet}
+        >
+          <Text style={styles.buttonText}>Menu</Text>
+        </TouchableOpacity>
+
+        {/* Task 4: Navigate to ActivityA (moved to bottom right) */}
+        <TouchableOpacity
+          style={styles.redButton}
+          onPress={() => {
+            router.push("/activityA");
+            showToast(
+              "Navigating to Activity A",
+              setToastVisible,
+              setToastMessage,
+            );
+          }}
+        >
+          <Text style={styles.buttonText}>Activity A</Text>
+        </TouchableOpacity>
+      </View>
 
       <BottomSheetDialog
         isVisible={isBottomSheetVisible}
@@ -148,56 +208,6 @@ export default function TasksScreen() {
           </TouchableOpacity>
         </View>
       </BottomSheetDialog>
-
-      {/* Task 2: Rotating Image with ObjectAnimator */}
-      <View style={styles.imageContainer}>
-        <Animated.Image
-          source={{
-            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ7fTFb3G8JZJy_oWg4rfoketLxdUnUF2eLw&s",
-          }}
-          alt={"Helloworld"}
-          style={[styles.image, { transform: [{ rotate: rotation }] }]}
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            rotateImage();
-            showToast("Image rotating", setToastVisible, setToastMessage);
-          }}
-        >
-          <Text style={styles.buttonText}>Rotate Image</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Task 3: RecyclerView with ClickListener */}
-      <Text style={styles.sectionTitle}>RecyclerView Items:</Text>
-      <FlatList
-        data={items}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.listItem}
-            onPress={() => handleItemClick(item)}
-          >
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id}
-      />
-
-      {/* Task 4: Navigate to ActivityA for Bundle example */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          router.push("/activityA");
-          showToast(
-            "Navigating to Activity A",
-            setToastVisible,
-            setToastMessage,
-          );
-        }}
-      >
-        <Text style={styles.buttonText}>Go to Activity A (Bundle Example)</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -206,27 +216,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f0f0f0", // Light gray background
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    color: "#000000", // Black text
   },
-  button: {
-    backgroundColor: "#2196F3",
+  // New style for red buttons
+  redButton: {
+    backgroundColor: "#FF0000", // Red color
     padding: 12,
     borderRadius: 8,
     marginVertical: 10,
     alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  // New style for black buttons
+  blackButton: {
+    backgroundColor: "#000000", // Black color
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
   },
   bottomSheetContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#222222", // Dark background
     padding: 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -234,10 +258,11 @@ const styles = StyleSheet.create({
   bottomSheetItem: {
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: "#333333", // Darker divider
   },
   bottomSheetText: {
     fontSize: 16,
+    color: "white",
   },
   imageContainer: {
     alignItems: "center",
@@ -247,34 +272,52 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 10,
+    borderRadius: 50, // Make image circular
+    borderWidth: 2,
+    borderColor: "#FF0000", // Red border
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 5,
     marginBottom: 10,
+    color: "#000000", // Black text
   },
   listItem: {
     padding: 15,
-    backgroundColor: "white",
+    backgroundColor: "#222222", // Dark background
     borderRadius: 8,
     marginBottom: 8,
     elevation: 2,
   },
-  // Toast styles
+  itemText: {
+    color: "white", // White text on dark background
+  },
+  flatList: {},
+  bottomSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  // Toast styles - positioned at right side
   toastContainer: {
     position: "absolute",
-    bottom: 50,
-    left: 20,
     right: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    padding: 12,
-    borderRadius: 8,
+    top: 50,
     zIndex: 1000,
-    alignItems: "center",
+  },
+  toastContent: {
+    backgroundColor: "#000000", // Black background
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 4,
+    borderLeftWidth: 4,
+    borderLeftColor: "#FF0000", // Red accent
+    minWidth: 200,
+    maxWidth: 300,
   },
   toastText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 14,
   },
 });
