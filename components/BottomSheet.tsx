@@ -28,6 +28,7 @@ export default function BottomSheetDialog({ isVisible, onClose, children }) {
   );
 }
 
+
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
